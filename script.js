@@ -1,3 +1,6 @@
+const ESIK_DEGER = 80;
+const XP = 50;
+const SEVIYE_XP = 150;
 const ad = document.getElementById("ad");
 const profilSecim = document.getElementById("profilSecim");
 const limit = document.getElementById("limit");
@@ -18,6 +21,29 @@ let disiplinPuanı = 0;
 let limitDegeri = 0;
 let toplamHarcama = 0;
 
+// FONKSİYONLAR
+function barGuncelle(gelenYuzde) {
+  if (gelenYuzde >= ESIK_DEGER) {
+    butceBar.style.backgroundColor = "red";
+  }
+  butceBar.style.width = gelenYuzde + "%";
+  guncelYuzdeMetni.style.left = gelenYuzde + "%";
+  guncelYuzdeMetni.innerText = "%" + Math.round(gelenYuzde);
+}
+function ayıSıfırla() {
+  butceBar.style.backgroundColor = "#1B3C53";
+  limitDegeri = 0;
+  toplamHarcama = 0;
+  limitGosterge.innerText = "Aylık Limitiniz: ";
+  harcamaGosterge.innerText = "Aylık Toplam Harcamanız: ";
+  guncelYuzdeMetni.innerText = "%0";
+  butceBar.style.width = "0%";
+  guncelYuzdeMetni.style.left = "0%";
+  limit.value = "";
+  harcama.value = "";
+  console.log("Ay kapatıldı, tüm veriler sıfırlandı.");
+}
+// PROFİL SEÇİM
 ad.addEventListener("input", function () {
   profilSecim.innerText = "";
   if (ad.value.length > 0) {
@@ -26,14 +52,18 @@ ad.addEventListener("input", function () {
     profilSecim.innerText = "Profilinizi Oluşturun";
   }
 });
-
+// LİMİT AYARLAMA
 gonderLimit.addEventListener("click", function () {
   limitDegeri = Number(limit.value);
   console.log("Yeni Limit Belirlendi: " + limitDegeri);
   limitGosterge.innerText = "Limitiniz : " + " " + limitDegeri + "TL";
 });
-
+// HARCAMA GİRDİSİ AYARLAMA
 gonderHarcama.addEventListener("click", function () {
+  if (limitDegeri === 0) {
+    alert("Önce bir limit belirlemelisin!");
+    return;
+  }
   toplamHarcama += Number(harcama.value);
   harcamaGosterge.innerText =
     "Toplam Harcamanız : " + " " + toplamHarcama + "TL";
@@ -41,42 +71,27 @@ gonderHarcama.addEventListener("click", function () {
   if (yuzde > 100) {
     yuzde = 100;
   }
-  if (yuzde >= 80) {
-    butceBar.style.backgroundColor = "red";
-  }
-  butceBar.style.width = yuzde + "%";
-  guncelYuzdeMetni.style.left = yuzde + "%";
-  guncelYuzdeMetni.innerText = "%" + Math.round(yuzde);
+  barGuncelle(yuzde);
 });
-
+// AY KAPANIŞI
 ayıKapat.addEventListener("click", function () {
   if (limitDegeri > 0) {
     if (limitDegeri > toplamHarcama) {
-      disiplinPuanı += 50;
+      disiplinPuanı += XP;
     } else {
-      disiplinPuanı -= 50;
+      disiplinPuanı -= XP;
     }
   } else {
     alert("Önce bir limit belirlemelisin!");
     return;
   }
 
-  if (disiplinPuanı >= 150) {
+  if (disiplinPuanı >= SEVIYE_XP) {
     seviye += 1;
     disiplinPuanı = 0;
   }
   disiplinGosterge.innerText =
     "Disiplin Puanı:" + " " + disiplinPuanı + " " + "xp";
   seviyeGosterge.innerText = "Seviye: " + " " + seviye;
-  butceBar.style.backgroundColor = "#1B3C53";
-  limitDegeri = 0;
-  toplamHarcama = 0;
-  limitGosterge.innerText = "Aylık Limitiniz: 0 TL";
-  harcamaGosterge.innerText = "Aylık Toplam Harcamanız: 0 TL";
-  guncelYuzdeMetni.innerText = "%0";
-  butceBar.style.width = "0%";
-  guncelYuzdeMetni.style.left = "0%";
-  limit.value = "";
-  harcama.value = "";
-  console.log("Ay kapatıldı, tüm veriler sıfırlandı.");
+  ayıSıfırla();
 });
